@@ -1,0 +1,54 @@
+name: Publish extension beta release
+
+on:
+  push:
+    tags:
+      - 'extension-v*'
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'SemVer beta version, for example 0.1.1-beta.2'
+        required: true
+        default: '0.1.1-beta.2'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - id: metadata
+        shell: bash
+        env:
+          INPUT_VERSION: ${{ inputs.release_version }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          version="${INPUT_VERSION:-$REF_NAME}"
+          version="${version#extension-v}"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=extension-v$version" >> "$GITHUB_OUTPUT"
+      - run: npm run release:build
+        env:
+          RELEASE_VERSION: ${{ steps.metadata.outputs.version }}
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.metadata.outputs.tag }}
+          name: DueVinci Coursework Importer ${{ steps.metadata.outputs.version }}
+          prerelease: true
+          generate_release_notes: true
+          body: |
+            Beta release for Chrome/Chromium and Safari Web Extension testing.
+
+            - Chromium: extract the ZIP and load the folder from `chrome://extensions`.
+            - Safari: extract the source ZIP and follow `SAFARI_BETA.md` to create the Xcode wrapper.
+
+            Use a test DueVinci account and review all coursework before importing.
+          files: dist/releases/*.zip

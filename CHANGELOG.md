@@ -18,3 +18,8 @@
   the WebExtension storage namespace yet.
 - Published a new Chrome test package so older unpacked builds can be replaced
   instead of continuing to report the `storage.local` error.
+
+### Release assets
+
+- Added separate Chrome/Chromium and Safari Web Extension source ZIPs to the
+  GitHub beta release workflow.

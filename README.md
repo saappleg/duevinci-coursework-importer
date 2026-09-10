@@ -55,6 +55,13 @@ Course rows use `name`, `code`, `emoji`, `color`, `user_id`, `lms_provider`, `lm
 3. Choose **Load unpacked** and select the [`extension/`](extension/) folder.
 4. Open a school course page, click the extension, connect the signed-in DueVinci tab, scan, review, and import.
 
+### Beta release downloads
+
+Each `extension-v*` beta release publishes two assets:
+
+- **Chromium** — extract the ZIP and choose **Load unpacked** on the extracted folder.
+- **Safari** — extract the Safari Web Extension source ZIP and follow [`SAFARI_BETA.md`](docs/SAFARI_BETA.md) to create the local Xcode wrapper.
+
 ## Beta feedback
 
 This project is actively being tested with WGU and Maestro accounts. Use the
