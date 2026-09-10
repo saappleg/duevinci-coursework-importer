@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DueVinci Importer</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="header">
+        <div class="mark" aria-hidden="true">D</div>
+        <div>
+          <p class="eyebrow">COURSEWORK IMPORTER</p>
+          <h1>DueVinci</h1>
+        </div>
+        <button id="settings-button" class="icon-button" type="button" title="Connection settings" aria-label="Connection settings">⚙</button>
+      </header>
+
+      <section id="beta-announcement" class="beta-announcement is-hidden" aria-labelledby="beta-announcement-title">
+        <div class="beta-announcement-topline">
+          <span class="beta-badge">BETA</span>
+          <button id="dismiss-beta-announcement" class="beta-dismiss" type="button" aria-label="Dismiss beta announcement">×</button>
+        </div>
+        <h2 id="beta-announcement-title">Help test the coursework importer</h2>
+        <p>WGU and Maestro imports are in beta. Review every item before sending it to DueVinci and tell us what needs fixing.</p>
+        <a class="beta-feedback-link" href="https://github.com/saappleg/duevinci-coursework-importer/issues/new?template=bug_report.md" target="_blank" rel="noopener noreferrer">Report beta feedback →</a>
+      </section>
+
+      <section class="intro">
+        <h2>Import from the page you have open</h2>
+        <p>We read course titles and due dates only after you choose to scan, then you approve exactly what is sent.</p>
+      </section>
+
+      <section class="source-picker">
+        <label for="source-select">Import source</label>
+        <select id="source-select">
+          <option value="auto">Auto-detect page</option>
+          <option value="wgu">WGU</option>
+          <option value="maestro">Maestro</option>
+          <option value="canvas">Canvas</option>
+          <option value="moodle">Moodle</option>
+          <option value="blackboard">Blackboard</option>
+          <option value="brightspace">Brightspace</option>
+          <option value="generic">Other school / generic page</option>
+        </select>
+        <p>Choose a profile when automatic detection does not recognize your school.</p>
+      </section>
+
+      <section id="connection-card" class="connection-card is-warning" aria-live="polite">
+        <span class="connection-dot" aria-hidden="true"></span>
+        <div>
+          <strong id="connection-title">DueVinci session needed</strong>
+          <p id="connection-detail">Keep a signed-in duevinci.tech tab open so imports use your account.</p>
+        </div>
+        <button id="connection-action" class="text-button" type="button">Connect</button>
+      </section>
+
+      <section class="scan-section">
+        <button id="scan-button" class="primary-button" type="button">
+          <span class="button-icon" aria-hidden="true">↻</span>
+          Scan current course page
+        </button>
+        <p id="status" class="status" role="status">Open a course page, then scan it.</p>
+      </section>
+
+      <section id="pacing-guide-panel" class="pacing-guide-panel is-hidden">
+        <div>
+          <strong>WGU pacing guide found</strong>
+          <p>Download the guide from WGU Connect, then choose its DOCX here to extract the weekly to-do list.</p>
+        </div>
+        <div class="pacing-guide-actions">
+          <button id="open-guide-button" class="secondary-button" type="button">Open guide</button>
+          <label class="file-button">
+            Choose DOCX
+            <input id="pacing-file" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+          </label>
+        </div>
+      </section>
+
+      <section id="course-window" class="course-window is-hidden" aria-live="polite">
+        <div class="course-window-heading">
+          <strong>Course window</strong>
+          <span id="course-window-source"></span>
+        </div>
+        <p id="course-window-dates"></p>
+        <div id="course-week-map" class="course-week-map"></div>
+      </section>
+
+      <section id="course-metadata" class="course-metadata is-hidden" aria-live="polite">
+        <strong>Course details found</strong>
+        <p id="course-description"></p>
+        <p id="course-competencies"></p>
+      </section>
+
+      <section id="review" class="review is-hidden" aria-live="polite">
+        <div class="review-heading">
+          <div>
+            <p id="source-platform" class="eyebrow"></p>
+            <h2 id="course-title">Detected coursework</h2>
+          </div>
+          <label class="select-all"><input id="select-all" type="checkbox" checked /> All</label>
+        </div>
+        <p id="scan-summary" class="summary"></p>
+        <div id="coursework-list" class="coursework-list"></div>
+      </section>
+
+      <footer id="footer-actions" class="footer is-hidden">
+        <button id="import-button" class="primary-button" type="button" disabled>Import selected</button>
+        <p class="privacy-note">No grades, student details, or page contents are collected.</p>
+      </footer>
+    </main>
+    <script src="docx-parser.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

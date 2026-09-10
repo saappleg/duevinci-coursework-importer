@@ -1,0 +1,15 @@
+{
+  "name": "duevinci-coursework-importer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "chrome:test": "node scripts/build-chrome-test.mjs",
+    "chrome:test:page": "node scripts/serve-test-page.mjs",
+    "extension:validate": "node scripts/validate-extension.mjs",
+    "test": "npm run extension:validate"
+  }
+}

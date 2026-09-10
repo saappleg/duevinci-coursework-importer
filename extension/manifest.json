@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "DueVinci Coursework Importer",
+  "version": "0.1.0",
+  "description": "Review and import coursework from the course page you have open into DueVinci.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": [
+    "https://my.wgu.edu/*",
+    "https://wguconnect.wgu.edu/*",
+    "https://duevinci.tech/*",
+    "https://*.duevinci.tech/*",
+    "https://lzmsguzlmjmedlaybckc.supabase.co/*"
+  ],
+  "action": {
+    "default_title": "Import coursework to DueVinci",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "options_page": "options.html",
+  "minimum_chrome_version": "102"
+}

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DueVinci Importer help</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="mark" aria-hidden="true">D</div>
+        <div>
+          <p class="eyebrow">DUEVINCI COURSEWORK IMPORTER</p>
+          <h1>How the connection works</h1>
+        </div>
+      </header>
+      <section class="lead">
+        <h2>Use your existing DueVinci sign-in</h2>
+        <p>This extension does not ask for your DueVinci password or store a second credential. Keep a signed-in <strong>duevinci.tech</strong> tab open, then use <strong>Connect</strong> in the popup.</p>
+      </section>
+      <section class="steps">
+        <div><span>1</span><p>Open <a href="https://duevinci.tech/" target="_blank" rel="noreferrer">duevinci.tech</a> and sign in.</p></div>
+        <div><span>2</span><p>Open your school’s course page in another tab.</p></div>
+        <div><span>3</span><p>Click this extension, scan, review, and import.</p></div>
+      </section>
+      <section class="schema-card">
+        <h2>What gets written</h2>
+        <p>The extension supports selectable WGU, Maestro, Canvas, Moodle, Blackboard, Brightspace, and generic page profiles. It uses DueVinci’s existing Supabase tables: one <code>courses</code> row and selected <code>assignments</code>. Imported rows use <code>lms_provider</code> and <code>lms_source_id</code> so repeated scans upsert instead of duplicating work.</p>
+        <p>Assignments are created incomplete with a medium priority. Detected quizzes map to <code>exam</code>; other coursework maps to <code>lesson</code>.</p>
+      </section>
+      <p id="status" role="status" class="status"></p>
+    </main>
+  </body>
+</html>
