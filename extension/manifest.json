@@ -1,7 +1,8 @@
 {
   "manifest_version": 3,
   "name": "DueVinci Coursework Importer",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "version_name": "0.1.1 beta",
   "description": "Review and import coursework from the course page you have open into DueVinci.",
   "permissions": ["activeTab", "scripting", "storage"],
   "host_permissions": [

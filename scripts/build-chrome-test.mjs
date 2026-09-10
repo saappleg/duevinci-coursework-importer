@@ -15,8 +15,8 @@ await cp(source, output, { recursive: true });
 const manifestPath = resolve(output, 'manifest.json');
 const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
 manifest.name = 'DueVinci Coursework Importer (Test)';
-manifest.version = '0.1.0.1';
-manifest.version_name = '0.1.0 test build';
+manifest.version = '0.1.1.1';
+manifest.version_name = '0.1.1 beta test build';
 manifest.description = 'Test build: review coursework from the local fixture or a course page before importing into DueVinci.';
 await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 
