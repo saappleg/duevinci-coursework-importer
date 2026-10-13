@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       release_version:
-        description: 'SemVer beta version, for example 0.1.1-beta.2'
+        description: 'SemVer beta version, for example 0.1.1-beta.3'
         required: true
-        default: '0.1.1-beta.2'
+        default: '0.1.1-beta.3'
 
 permissions:
   contents: write
@@ -38,6 +38,9 @@ jobs:
       - run: npm run release:build
         env:
           RELEASE_VERSION: ${{ steps.metadata.outputs.version }}
+      - run: npm run release:validate
+        env:
+          RELEASE_VERSION: ${{ steps.metadata.outputs.version }}
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.metadata.outputs.tag }}
@@ -45,9 +48,10 @@ jobs:
           prerelease: true
           generate_release_notes: true
           body: |
-            Beta release for Chrome/Chromium and Safari Web Extension testing.
+            Beta release packages for Chromium, Firefox, and Safari testing.
 
-            - Chromium: extract the ZIP and load the folder from `chrome://extensions`.
+            - Chromium: extract the ZIP and choose **Load unpacked** at `chrome://extensions`.
+            - Firefox: extract the ZIP and load its `manifest.json` temporarily from `about:debugging` → **This Firefox** → **Load Temporary Add-on**. This beta package is unsigned; permanent installs in Firefox Release/Beta require Mozilla signing.
             - Safari: extract the source ZIP and follow `SAFARI_BETA.md` to create the Xcode wrapper.
 
             Use a test DueVinci account and review all coursework before importing.

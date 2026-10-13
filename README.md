@@ -6,7 +6,7 @@
 
 A privacy-conscious browser extension for importing coursework from the course page a student has open—without relying on a school’s Canvas API or personal-access-token policy.
 
-The extension source is in [`extension/`](extension/). It supports Chrome and other Chromium browsers directly, and is structured as a Safari Web Extension source package.
+The extension source is in [`extension/`](extension/). Release builds are packaged for Chrome and other Chromium browsers, Firefox, and Safari Web Extensions.
 
 This is the companion repository for [DueVinci](https://github.com/saappleg/DueVinci).
 The importer writes through the same signed-in DueVinci account and uses the
@@ -61,9 +61,10 @@ Course rows use `name`, `code`, `emoji`, `color`, `user_id`, `lms_provider`, `lm
 
 ### Beta release downloads
 
-Each `extension-v*` beta release publishes two assets:
+Each `extension-v*` beta release publishes separate packages for the supported browser families:
 
 - **Chromium** — extract the ZIP and choose **Load unpacked** on the extracted folder.
+- **Firefox** — extract the ZIP, open `about:debugging`, select **This Firefox** → **Load Temporary Add-on**, and choose its `manifest.json`. The beta ZIP is unsigned; Mozilla signing is required for permanent installation in Firefox Release or Beta.
 - **Safari** — extract the Safari Web Extension source ZIP and follow [`SAFARI_BETA.md`](docs/SAFARI_BETA.md) to create the local Xcode wrapper.
 
 ## Beta feedback

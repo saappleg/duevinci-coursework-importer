@@ -20,3 +20,5 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run chrome:test
+      - run: npm run release:build
+      - run: npm run release:validate

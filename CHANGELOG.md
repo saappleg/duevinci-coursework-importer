@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.1-beta.3
+
+### Added
+
+- Firefox Manifest V3 package with Firefox's background-script format and a
+  minimum version that supports the scanner's main-world script injection.
+- Chromium, Firefox, and Safari source packages on each tagged GitHub beta
+  release.
+- Brightspace/SNHU Learning Modules extraction for reviewable coursework.
+
+### Notes
+
+- The Firefox package is unsigned for temporary testing. Mozilla signing is
+  required for permanent installation in Firefox Release or Beta.
+
 ## 0.1.0-beta.1
 
 ### Added
