@@ -47,7 +47,7 @@
     if (host === 'my.wgu.edu' || host.endsWith('.my.wgu.edu')) return 'wgu';
     if (host === 'app.maestro.org' || host.endsWith('.maestro.org')) return 'maestro';
     if (host.includes('instructure.com') || body.includes('context_modules') || document.querySelector('#assignments')) return 'canvas';
-    if (host.includes('brightspace.com') || host.includes('desire2learn') || document.querySelector('d2l-navigation-main-header')) return 'brightspace';
+    if (host === 'learn.snhu.edu' || host.includes('brightspace.com') || host.includes('desire2learn') || location.pathname.startsWith('/d2l/') || document.querySelector('d2l-navigation-main-header')) return 'brightspace';
     if (host.includes('blackboard') || document.querySelector('#content_listContainer')) return 'blackboard';
     if (host.includes('moodle') || document.querySelector('.activity-item, .courseindex-item')) return 'moodle';
     return 'generic';
@@ -147,7 +147,10 @@
       const href = anchor.href || '';
       return /\/courses\/(?:course\/)?\d+/i.test(href) && !/assignments|modules|quizzes|discussions/i.test(href) && clean(anchor.textContent).length > 1;
     });
-    const breadcrumbTitle = clean(courseLinks.at(-1)?.textContent || '');
+    const brightspaceCourseLink = platform === 'brightspace'
+      ? [...document.querySelectorAll('a[href]')].find((anchor) => /\/d2l\/home\/\d+(?:\/|$)/i.test(anchor.getAttribute('href') || ''))
+      : null;
+    const breadcrumbTitle = clean(brightspaceCourseLink?.textContent || courseLinks.at(-1)?.textContent || '');
     const heading = document.querySelector('main h1, #content h1, .d2l-page-title, [data-testid="course-title"], [data-testid*="course-name"], h1');
     const fallbackTitle = clean(heading?.textContent || '').replace(/\s+[-|–]\s+.+$/, '');
     const maestroPath = location.pathname.match(/\/learn\/([^/]+\/[^/]+)/i)?.[1] || '';
@@ -165,6 +168,9 @@
     const canvasCourse = location.pathname.match(/\/courses\/(\d+)/i)?.[1];
     const moodleCourse = new URL(location.href).searchParams.get('id');
     const wguCourse = location.pathname.match(/\/courses\/course\/(\d+)/i)?.[1];
+    const pageUrl = new URL(location.href);
+    const brightspaceCourse = pageUrl.pathname.match(/\/d2l\/(?:home|le\/content)\/(\d+)(?:\/|$)/i)?.[1]
+      || pageUrl.searchParams.get('ou');
     const maestroCourse = maestroPath || location.pathname.match(/\/learn\/([^/]+)/i)?.[1];
     const pageText = clean(document.body?.textContent || '');
     const startedText = pageText.match(/Course\s+Started\s*[-:]\s*([A-Za-z]+\s+\d{1,2},?\s+\d{2,4}|\d{1,2}\/\d{1,2}\/\d{2,4})/i)?.[1] || '';
@@ -178,7 +184,12 @@
     const courseCompetencies = platform === 'wgu'
       ? (wguCompetencyNames() || labeledCourseSection(['course competencies', 'competencies', 'course objectives', 'objectives']) || textCourseSection(['course competencies', 'competencies', 'course objectives', 'objectives'], ['course materials', 'course tips', 'assessments', 'resources', 'pacing guide']))
       : '';
-    const sourceKey = canvasCourse ? `canvas:${canvasCourse}` : moodleCourse ? `moodle:${moodleCourse}` : wguCourse ? `wgu:${wguCourse}` : maestroCourse ? `maestro:${maestroCourse}` : `${platform}:${location.origin}${location.pathname}`;
+    const sourceKey = canvasCourse ? `canvas:${canvasCourse}`
+      : moodleCourse ? `moodle:${moodleCourse}`
+        : wguCourse ? `wgu:${wguCourse}`
+          : maestroCourse ? `maestro:${maestroCourse}`
+            : platform === 'brightspace' && brightspaceCourse ? `brightspace:${location.origin}/d2l/home/${brightspaceCourse}`
+              : `${platform}:${location.origin}${location.pathname}`;
     return { courseTitle, courseCode, courseSourceId: `browser:${sourceKey}`, courseStartAt, courseEndAt, courseWindowValid, courseDescription, courseCompetencies };
   }
 
@@ -495,6 +506,66 @@
     };
   }
 
+  function brightspaceWeekNumber(value) {
+    const match = clean(value).match(/\b(?:week|module)\s*#?\s*(\d{1,2}|first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|one|two|three|four|five|six|seven|eight|nine|ten)\b/i);
+    if (!match) return null;
+    const wordNumbers = { first: 1, one: 1, second: 2, two: 2, third: 3, three: 3, fourth: 4, four: 4, fifth: 5, five: 5, sixth: 6, six: 6, seventh: 7, seven: 7, eighth: 8, eight: 8, ninth: 9, nine: 9, tenth: 10, ten: 10 };
+    return Number(match[1]) || wordNumbers[match[1].toLowerCase()] || null;
+  }
+
+  function scanBrightspaceContentPage(context) {
+    const links = [...document.querySelectorAll('a[href]')].filter((anchor) => /\/d2l\/le\/content\/\d+\/viewContent\/\d+/i.test(anchor.getAttribute('href') || ''));
+    const headings = [...document.querySelectorAll('main h2, main h3, h2, h3')];
+    const seen = new Set();
+    const items = [];
+
+    for (const anchor of links) {
+      const sourceUrl = anchor.href;
+      if (!sourceUrl || seen.has(sourceUrl) || items.length >= MAX_ITEMS) continue;
+      seen.add(sourceUrl);
+
+      const title = clean(anchor.textContent || anchor.getAttribute('title')?.replace(/^['\"]|['\"]$/g, '') || '');
+      if (!title || title.length > 180) continue;
+
+      const topic = anchor.closest('.d2l-topic-view') || anchor.parentElement;
+      const titleMetadata = clean(anchor.getAttribute('title') || '');
+      const typeLabel = titleMetadata.match(/\s-\s(.+)$/)?.[1]
+        || clean(topic?.querySelector('.d2l-container-icon')?.textContent || '');
+      const moduleHeading = headings
+        .filter((heading) => Boolean(heading.compareDocumentPosition(anchor) & Node.DOCUMENT_POSITION_FOLLOWING))
+        .at(-1);
+      const moduleName = clean(moduleHeading?.textContent || '');
+      const sourceText = `${title} ${typeLabel}`;
+      const parsedKind = itemKind(sourceText);
+      const due = dueDetails(clean(topic?.innerText || topic?.textContent || ''));
+      const stableKey = `${context.courseSourceId}|${sourceUrl}`;
+
+      items.push({
+        id: `school-brightspace-${btoa(unescape(encodeURIComponent(stableKey))).replace(/=+$/g, '').slice(0, 48)}`,
+        title,
+        dueAt: due.dueAt,
+        dueText: due.dueText,
+        kind: parsedKind === 'coursework' || parsedKind === 'module' ? 'lesson' : parsedKind,
+        sourceUrl,
+        selected: true,
+        week: brightspaceWeekNumber(moduleName),
+        source: 'brightspace_learning_modules',
+      });
+    }
+
+    const onCourseHome = /\/d2l\/home\/\d+(?:\/|$)/i.test(location.pathname);
+    return {
+      platform: 'brightspace',
+      ...context,
+      url: location.href,
+      capturedAt: new Date().toISOString(),
+      items,
+      scanHint: items.length ? '' : onCourseHome
+        ? 'This SNHU course home shows the course shell. Open Course Menu → Learning Modules or Assignments, then scan that page.'
+        : 'No coursework links were visible here. Open Course Menu → Learning Modules or Assignments, then scan that page.',
+    };
+  }
+
   async function scanPage(sourceOverride = 'auto') {
     const platform = platformForPage(sourceOverride);
     const looksLikeWguTermPage = /\/home(?:\/|$)/i.test(location.pathname)
@@ -503,6 +574,7 @@
     const context = courseContext(platform);
     if (platform === 'wgu') return scanWguCoursePage(context);
     if (platform === 'maestro') return scanMaestroPage(context);
+    if (platform === 'brightspace' && /\/d2l\/le\/content\/\d+\/Home(?:\/|$)/i.test(location.pathname)) return scanBrightspaceContentPage(context);
     const selectors = [...(PLATFORM_SELECTORS[platform] || []), ...PLATFORM_SELECTORS.generic];
     const nodes = selectors.flatMap((selector) => [...document.querySelectorAll(selector)]);
     const seen = new Set();
@@ -531,7 +603,12 @@
       });
     }
 
-    return { platform, ...context, url: location.href, capturedAt: new Date().toISOString(), items };
+    const scanHint = platform === 'brightspace' && !items.length
+      ? /\/d2l\/home\/\d+(?:\/|$)/i.test(location.pathname)
+        ? 'This SNHU course home shows the course shell. Open Course Menu → Learning Modules or Assignments, then scan that page.'
+        : 'No coursework was visible here. Open Course Menu → Learning Modules or Assignments, then scan that page.'
+      : '';
+    return { platform, ...context, url: location.href, capturedAt: new Date().toISOString(), items, scanHint };
   }
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {

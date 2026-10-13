@@ -289,7 +289,7 @@ async function scanPage() {
       const scheduleMessage = result.scan.termScheduleMatched ? ' Saved course dates matched.' : ' Scan the WGU term page first to save its course dates.';
       setStatus(`The course page has no direct coursework dates. Choose its downloaded pacing guide DOCX below to create weekly lessons; page assessment links stay unselected.${scheduleMessage}`, result.scan.termScheduleMatched ? 'success' : 'error');
     } else {
-      setStatus(result.scan.items.length ? 'Review the detected coursework before it is sent.' : 'No coursework was detected here. Try a page that lists assignments or modules.', result.scan.items.length ? 'success' : 'error');
+      setStatus(result.scan.items.length ? 'Review the detected coursework before it is sent.' : (result.scan.scanHint || 'No coursework was detected here. Try a page that lists assignments or modules.'), result.scan.items.length ? 'success' : 'error');
     }
   } catch (error) {
     setStatus(error instanceof Error ? error.message : 'The course page could not be scanned.', 'error');

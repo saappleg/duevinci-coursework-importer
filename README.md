@@ -40,6 +40,10 @@ Before importing, scan the WGU term page once. The extension saves the complete 
 
 Maestro keeps coursework in a virtualized weekly list rather than exposing direct due dates. The Maestro adapter scrolls through that list, captures every lesson (including cards that are rendered as completed `div` elements), and imports one **Unit** parent for each weekly subject. The unit and its linked lesson rows all use the end of that week's range as their target date; lessons are shown beneath the unit with a `↳` prefix. The final card in each week is imported as a review; the final review in the course is imported as an exam. It also reads the **Course syllabus** panel for the official course name, description, and objectives, then closes the panel when it opened it. A full Maestro course scan is still review-first, and the preview should show the complete item count before import.
 
+### Brightspace and SNHU
+
+SNHU's Brightspace course homepage may show only the course shell. Open **Course Menu → Learning Modules** and scan that page to import its topic links as reviewable lessons; module headings such as “Week 1” or “Module One” are saved as the lesson's unit number. Open **Course Menu → Assignments** to scan Brightspace's assignment list and due dates. The browser calendar feed remains the source for calendar events and dates that Brightspace exposes only in its calendar.
+
 ## DueVinci data contract
 
 The adapter follows the current DueVinci GitHub source. It authenticates with the access token from an already signed-in `duevinci.tech` tab and writes through Supabase using the public app key. It upserts one row in `courses`, then selected rows in `assignments`.
